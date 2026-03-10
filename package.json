@@ -1,0 +1,14 @@
+{
+  "name": "alvi-vps-panel",
+  "version": "1.0.0",
+  "description": "Premium VPS Panel for Albi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "systeminformation": "^5.21.22",
+    "cors": "^2.8.5"
+  }
+}

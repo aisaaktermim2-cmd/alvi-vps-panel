@@ -1,113 +1,40 @@
+<script>
+    const loginForm = document.getElementById('loginForm');
+    
+    // ফর্ম সাবমিট হওয়া আটকানো এবং পাসওয়ার্ড চেক করা
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // এটি 'Cannot POST /login' এরর আসা বন্ধ করবে
+        
+        const passwordInput = document.getElementById('password').value;
+        const correctPassword = 'MG24'; // আপনার পাসওয়ার্ড
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRIME VPS - Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #00ff00;
-            --secondary: #00cc00;
-            --accent: #00ff80;
-            --bg: #000000;
-            --card-bg: #0a0a0a;
-            --text: #00ff00;
-            --danger: #ff0000;
+        if (passwordInput === correctPassword) {
+            // যদি পাসওয়ার্ড ঠিক থাকে, তবে সরাসরি ড্যাশবোর্ড কন্টেন্ট দেখাবে
+            alert('AUTHENTICATION SUCCESSFUL!');
+            // আপনি যদি সব এক পেজে রাখতে চান, তবে এখানে ড্যাশবোর্ড দেখানোর লজিক কাজ করবে
+            // অথবা চাইলে সরাসরি আপনার আগের ড্যাশবোর্ড লিঙ্কে পাঠিয়ে দিতে পারেন
+            // window.location.href = '/dashboard.html'; 
+        } else {
+            alert('ACCESS DENIED! Invalid Security Key.');
         }
-        
-        body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Courier New', monospace;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
+    });
+
+    // ম্যাট্রিক্স ইফেক্ট চালু রাখা
+    function createMatrix() {
+        const matrix = document.getElementById('matrix');
+        if(!matrix) return;
+        const columns = Math.floor(window.innerWidth / 20);
+        for (let i = 0; i < columns; i++) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = i * 20 + 'px';
+            column.style.animationDuration = Math.random() * 5 + 3 + 's';
+            column.innerHTML = '01アイウエオ'.split('').join('<br>');
+            matrix.appendChild(column);
         }
-        
-        .matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.1;
-        }
-        
-        .matrix-column {
-            position: absolute;
-            top: 0;
-            color: var(--primary);
-            font-size: 14px;
-            line-height: 1;
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            animation: matrix-fall linear infinite;
-        }
-        
-        @keyframes matrix-fall {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(100vh); }
-        }
-        
-        .login-container {
-            background: var(--card-bg);
-            border: 2px solid var(--primary);
-            border-radius: 10px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 0 30px var(--primary);
-            animation: pulse 3s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 20px var(--primary); }
-            50% { box-shadow: 0 0 40px var(--primary); }
-            100% { box-shadow: 0 0 20px var(--primary); }
-        }
-        
-        .password-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        
-        .login-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--primary);
-            color: var(--text);
-            padding: 12px 45px 12px 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            transition: all 0.3s;
-        }
-        
-        .login-input:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 15px var(--secondary);
-        }
-        
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary);
-            cursor: pointer;
+    }
+    createMatrix();
+</script>
             font-size: 18px;
             opacity: 0.7;
             transition: all 0.2s;

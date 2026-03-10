@@ -1,0 +1,11 @@
+async function updateStats() {
+    try {
+        const response = await fetch('/system_stats');
+        const data = await response.json();
+        document.getElementById('cpu-usage').innerText = data.cpu + '%';
+        document.getElementById('ram-usage').innerText = data.ram + '%';
+    } catch (err) {
+        console.error("Stats error");
+    }
+}
+setInterval(updateStats, 2000); 

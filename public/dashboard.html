@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MG24 PREMIUM VPS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #00ff00; --bg: #000000; --card: #0a0a0a; --text: #ffffff; }
+        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; }
+        .card-bg { background: var(--card); border: 1px solid rgba(0,255,0,0.1); }
+        .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; background: var(--card); transition: 0.3s; z-index: 100; border-right: 1px solid var(--primary); }
+        .sidebar.open { left: 0; }
+        .main-view { display: none; }
+        .main-view.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="border-b border-green-500/30 p-4 flex justify-between items-center bg-black/90 sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-green-500 text-xl"><i class="fas fa-bars"></i></button>
+            <h1 class="font-bold tracking-widest text-green-500">MG24 VPS</h1>
+        </div>
+        <div class="text-[10px] font-mono text-green-500/70">
+            CPU: <span id="cpu-usage">0%</span> | RAM: <span id="ram-usage">0%</span>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="p-6 text-center border-b border-green-500/20">
+            <h2 class="text-xl font-bold text-green-500">ALBI PANEL</h2>
+        </div>
+        <div class="p-4 space-y-2">
+            <button onclick="showView('dashboard')" class="w-full text-left p-3 hover:bg-green-500/10 rounded">Dashboard</button>
+            <button onclick="showView('packages')" class="w-full text-left p-3 hover:bg-green-500/10 rounded">Package Manager</button>
+            <button onclick="showView('telegram')" class="w-full text-left p-3 hover:bg-green-500/10 rounded">Telegram Bot</button>
+            <button onclick="location.href='/'" class="w-full text-left p-3 text-red-500 mt-10">Logout</button>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="main-view active p-4">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="card-bg p-6 rounded-xl text-center">
+                <h3 class="text-3xl font-bold text-green-500">0</h3>
+                <p class="text-[10px] uppercase opacity-50">Running</p>
+            </div>
+            <div class="card-bg p-6 rounded-xl text-center">
+                <h3 class="text-3xl font-bold text-green-500">0</h3>
+                <p class="text-[10px] uppercase opacity-50">Total</p>
+            </div>
+        </div>
+        <div class="mt-10 text-center opacity-30">
+            <i class="fas fa-server text-5xl mb-3"></i>
+            <p>No servers deployed yet</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function showView(viewId) {
+            document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId + '-view').classList.add('active');
+            toggleSidebar();
+        }
+
+        async function updateStats() {
+            try {
+                const res = await fetch('/system_stats');
+                const data = await res.json();
+                document.getElementById('cpu-usage').innerText = data.cpu + '%';
+                document.getElementById('ram-usage').innerText = data.ram + '%';
+            } catch (e) {}
+        }
+        setInterval(updateStats, 2000);
+    </script>
+</body>
+              </html>
+  

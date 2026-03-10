@@ -1,6 +1,7 @@
 {
-  "name": "prime-vps",
+  "name": "prime-vps-panel",
   "version": "1.0.0",
+  "description": "Secure VPS Management",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

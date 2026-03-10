@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MG24 PREMIUM VPS - LOGIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; overflow: hidden; }
+        .glow { box-shadow: 0 0 20px rgba(0, 255, 0, 0.2); border: 1px solid #0f0; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="p-8 glow rounded-xl text-center max-w-sm w-full bg-black/80 backdrop-blur-md">
+        <div class="mb-6">
+            <span class="text-6xl">💀</span>
+            <h1 class="text-3xl font-bold mt-4 tracking-tighter text-green-500">MG24 VPS</h1>
+            <p class="text-[10px] opacity-70 mt-1 uppercase tracking-widest">Secure Terminal v2.3</p>
+        </div>
+
+        <div class="space-y-4">
+            <input type="password" id="pass" placeholder="Enter Access Password" 
+                   class="w-full bg-black border border-green-900 p-3 rounded text-center outline-none focus:border-green-500 text-green-500 transition-all">
+            
+            <button onclick="login()" class="w-full bg-green-500/10 border border-green-500 text-green-500 font-bold py-3 rounded hover:bg-green-500 hover:text-black transition-all">
+               >_ AUTHENTICATE
+            </button>
+        </div>
+        
+        <p class="text-[9px] mt-6 opacity-40 uppercase">Unauthorized Access Prohibited</p>
+    </div>
+
+    <script>
+        async function login() {
+            const password = document.getElementById('pass').value;
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ password })
+            });
+            if (res.ok) { 
+                window.location.href = '/dashboard.html'; 
+            } else { 
+                alert('ACCESS DENIED: INVALID CREDENTIALS'); 
+            }
+        }
+    </script>
+</body>
+      </html>
+

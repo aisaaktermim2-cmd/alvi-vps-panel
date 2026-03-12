@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHANTO - LOGIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #000; color: #33ffff; font-family: 'Courier New', monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-box { background: #0a0a0a; border: 2px solid #33ffff; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px #33ffff; width: 90%; max-width: 400px; text-align: center; }
+        input { background: rgba(0,0,0,0.5); border: 1px solid #33ffff; color: #fff; width: 100%; padding: 12px; border-radius: 5px; margin: 20px 0; outline: none; }
+        .btn { width: 100%; border: 2px solid #33ffff; padding: 12px; color: #33ffff; font-weight: bold; cursor: pointer; transition: 0.3s; background: transparent; }
+        .btn:hover { background: #33ffff; color: #000; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <i class="fas fa-skull text-6xl mb-4"></i>
+        <h1 class="text-2xl font-bold">SHANTO</h1>
+        <p class="text-[10px] opacity-60 mb-8">AUTHENTICATION REQUIRED</p>
+        <form action="/login" method="POST">
+            <input type="password" name="password" placeholder="ENTER MG24PRO PASSWORD" required>
+            <button type="submit" class="btn">LOGIN TO VPS</button>
+        </form>
+    </div>
+</body>
+</html>

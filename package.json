@@ -1,13 +1,14 @@
 {
-  "name": "prime-vps-panel",
+  "name": "shanto-cyber-vps",
   "version": "1.0.0",
-  "description": "Secure VPS Management",
+  "description": "Cyber Panel for Albi Boss",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
+    "path": "^0.12.7"
   }
 }
-

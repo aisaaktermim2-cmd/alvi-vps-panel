@@ -1,48 +1,62 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const path = require('path');
+const { spawn } = require('child_process');
+
 const app = express();
+const port = process.env.PORT || 3000;
 
-// ফর্ম থেকে ডেটা পড়ার জন্য
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// ফাইল স্টোর করার অবজেক্ট
+let activeProcesses = {};
 
-// public ফোল্ডারটি স্ট্যাটিক হিসেবে সেট করা
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname)));
+app.use(fileUpload());
 
-// পাসওয়ার্ড চেক করার লজিক
-app.post('/login', (req, res) => {
-    const { password } = req.body;
-    const correctPassword = 'MG24'; // এটাই আপনার পাসওয়ার্ড
+// মেইন পেজ লোড
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-    if (password === correctPassword) {
-        // পাসওয়ার্ড ঠিক থাকলে ড্যাশবোর্ডে নিয়ে যাবে
-        // যেহেতু আপনি আলাদা ড্যাশবোর্ড ফাইল চাচ্ছেন না, 
-        // তাই আপাতত একটি সাকসেস মেসেজ বা আপনার ড্যাশবোর্ড কন্টেন্ট এখানে দেওয়া যায়।
-        res.send(`
-            <body style="background:#000; color:#0f0; font-family:monospace; padding:50px;">
-                <h1>AUTHENTICATION SUCCESSFUL!</h1>
-                <p>Welcome to PRIME VPS Terminal.</p>
-                <hr border="1px solid #0f0">
-                <p>Status: ACTIVE</p>
-                <p>User: ALBI (Dakshata Sperm)</p>
-                <br>
-                <button onclick="location.href='/'" style="background:none; border:1px solid #0f0; color:#0f0; padding:10px; cursor:pointer;">LOGOUT</button>
-            </body>
-        `);
-    } else {
-        // পাসওয়ার্ড ভুল হলে
-        res.send(`
-            <body style="background:#000; color:red; font-family:monospace; text-align:center; padding-top:100px;">
-                <h1>ACCESS DENIED!</h1>
-                <p>Invalid Security Key.</p>
-                <a href="/" style="color:white;">Try Again</a>
-            </body>
-        `);
+// ফাইল আপলোড সিস্টেম (আপনার প্যানেলে নতুন স্ক্রিপ্ট যোগ করার জন্য)
+app.post('/upload', (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files were uploaded.');
     }
+
+    let pythonFile = req.files.pythonFile;
+    pythonFile.mv(path.join(__dirname, pythonFile.name), (err) => {
+        if (err) return res.status(500).send(err);
+        res.redirect('/?msg=UploadSuccess');
+    });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log('Server is running on port ' + PORT);
+// আপনার HTML বাটনগুলোর অ্যাকশন হ্যান্ডলার
+app.get('/action/:scriptName/:type', (req, res) => {
+    const { scriptName, type } = req.params;
+    const fileName = scriptName.endsWith('.py') ? scriptName : `${scriptName}.py`;
+
+    if (type === 'restart' || type === 'start') {
+        // আগের প্রসেস থাকলে বন্ধ করা
+        if (activeProcesses[scriptName]) {
+            activeProcesses[scriptName].kill();
+        }
+        // নতুন করে রান করা
+        const process = spawn('python3', [fileName]);
+        activeProcesses[scriptName] = process;
+        console.log(`${fileName} started!`);
+    } 
+    else if (type === 'stop') {
+        if (activeProcesses[scriptName]) {
+            activeProcesses[scriptName].kill();
+            delete activeProcesses[scriptName];
+            console.log(`${fileName} stopped!`);
+        }
+    }
+
+    res.redirect('/');
 });
 
+app.listen(port, () => {
+    console.log(`SHANTO Cyber Panel running on port ${port}`);
+});
+        

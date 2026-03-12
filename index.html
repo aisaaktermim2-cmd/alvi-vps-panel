@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHANTO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="https://i.ibb.co/p6QT56tY/file-00000000dd787208baad53f4113c48c5.png">
+    <style>
+        :root {
+            --primary: #33ffff;
+            --secondary: #00cccc;
+            --accent: #ff80ff;
+            --bg: #000000;
+            --card-bg: #0a0a0a;
+            --text: #ffffff;
+            --danger: #ff4d4d;
+            --header-text: #ffffff;
+            --stats-text: #ffffff;
+            --font-family: &#39;Consolas&#39;, monospace;
+        }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: var(--font-family);
+            padding-bottom: 80px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .header-text {
+            color: var(--header-text);
+        }
+        
+        .stats-text {
+            color: var(--stats-text);
+        }
+        
+        .theme-gradient { 
+            background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent)); 
+        }
+        .theme-gradient-hover:hover { 
+            background: linear-gradient(to right, var(--accent), var(--secondary), var(--primary)); 
+        }
+        .theme-active-border { 
+            border-bottom: 2px solid var(--primary); 
+            color: var(--primary); 
+        }
+        
+        .card-bg { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: var(--bg); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        
+        .modal-enter { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .fab { animation: bounceIn 0.5s; }
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .log-text { font-size: 11px; user-select: text; }
+        .log-text::selection { background: var(--primary); color: black; }
+
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: var(--card-bg);
+            border-right: 2px solid var(--primary);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        
+        .sidebar.open {
+            left: 0;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 999;
+            display: none;
+        }
+        
+        .sidebar-overlay.open {
+            display: block;
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+        
+        .menu-item:hover {
+            background: rgba(0,0,0,0.2);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .menu-item.active {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .dropdown-menu { 
+            display: none; 
+            position: absolute; 
+            right: 0; 
+            top: 100%; 
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; 
+            z-index: 10; 
+            min-width: 200px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+        
+        .dropdown-menu button, .dropdown-menu a {
+            width: 100%;
+            text-align: left;
+            padding: 10px 15px;
+            color: var(--text);
+            transition: all 0.2s;
+            font-size: 13px;
+            border: none;
+            background: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dropdown-menu button:hover, .dropdown-menu a:hover {
+            background: rgba(0,0,0,0.3);
+            color: var(--primary);
+        }
+
+        .main-view {
+            display: none;
+        }
+        
+        .main-view.active {
+            display: block;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.03;
+        }
+        
+        .matrix-column {
+            position: absolute;
+            top: 0;
+            color: var(--primary);
+            font-size: 14px;
+            line-height: 1;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            animation: matrix-fall linear infinite;
+        }
+        
+        @keyframes matrix-fall {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100vh); }
+        }
+
+        .color-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .color-dot:hover {
+            transform: scale(1.2);
+            border-color: white;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .server-card {
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-number {
+            color: var(--stats-text);
+            font-weight: bold;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--primary);
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .password-toggle:hover {
+            opacity: 1;
+        }
+
+        /* File list styles */
+        .file-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s;
+            margin-bottom: 2px;
+            color: #ffffff;
+        }
+        
+        .file-item:hover {
+            background: rgba(0,0,0,0.5);
+            border-color: var(--primary);
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: #ffffff;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+        
+        .folder-size {
+            font-size: 11px;
+            color: #ffffff;
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        .total-size {
+            font-size: 13px;
+            color: #ffffff;
+            opacity: 0.9;
+            font-weight: bold;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            margin-top: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .file-icon {
+            color: #ffffff;
+            opacity: 0.8;
+        }
+
+        .file-name {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg" id="matrix"></div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="p-6 text-center border-b" style="border-color: var(--primary);">
+            <img src="https://i.ibb.co/p6QT56tY/file-00000000dd787208baad53f4113c48c5.png" alt="icon" class="w-12 h-12 mx-auto mb-2" style="filter: drop-shadow(0 0 10px var(--primary));">
+            <h2 class="text-xl font-bold mt-2 header-text">SHANTO</h2>
+            <p class="text-xs mt-2 opacity-50">CYBER MODE</p>
+        </div>
+        
+        <div class="menu-item active" onclick="switchMainView('dashboard')">
+            <i class="fas fa-tachometer-alt w-5"></i>
+            <span>Dashboard</span>
+        </div>
+        
+        <div class="menu-item" onclick="switchMainView('theme')">
+            <i class="fas fa-palette w-5"></i>
+            <span>Theme Customizer</span>
+        </div>
+        
+        <div class="menu-item" onclick="switchMainView('packages')">
+            <i class="fas fa-cubes w-5"></i>
+            <span>Package Manager</span>
+        </div>
+        
+        <div class="menu-item" onclick="switchMainView('telegram')">
+            <i class="fab fa-telegram w-5"></i>
+            <span>Telegram Bot</span>
+        </div>
+        
+        <div class="menu-item" onclick="switchMainView('settings')">
+            <i class="fas fa-cog w-5"></i>
+            <span>Settings</span>
+        </div>
+        
+        <div class="menu-item" onclick="location.href='/logout'">
+            <i class="fas fa-sign-out-alt w-5"></i>
+            <span>Logout</span>
+        </div>
+    </div>
+
+    <div class="bg-black/90 backdrop-blur-md border-b sticky top-0 z-30 px-4 py-3 shadow-lg" style="border-color: var(--primary);">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="text-2xl hover:opacity-80 transition" style="color: var(--primary);">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <img src="https://i.ibb.co/p6QT56tY/file-00000000dd787208baad53f4113c48c5.png" alt="icon" class="w-6 h-6" style="filter: drop-shadow(0 0 5px var(--primary));">
+                    <h1 class="text-lg font-bold tracking-wider header-text">SHANTO</h1>
+                </div>
+            </div>
+            <div class="text-[10px] font-mono stats-text">
+                CPU: <span id="cpu-usage" class="stats-number">14.1%</span> | 
+                RAM: <span id="ram-usage" class="stats-number">62.5%</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="main-view active">
+        <div class="px-4 mt-6 grid grid-cols-2 gap-3">
+            <div class="card-bg p-4 rounded-xl flex flex-col items-center">
+                <span class="text-2xl stats-number" id="running-count">3</span>
+                <span class="text-[10px] opacity-50 uppercase tracking-widest stats-text">Running</span>
+            </div>
+            <div class="card-bg p-4 rounded-xl flex flex-col items-center">
+                <span class="text-2xl stats-number" id="total-count">3</span>
+                <span class="text-[10px] opacity-50 uppercase tracking-widest stats-text">Total</span>
+            </div>
+        </div>
+
+        <div class="px-4 mt-8 space-y-4">
+            
+            <div class="card-bg rounded-2xl overflow-hidden shadow-lg relative group server-card">
+                <div class="absolute left-0 top-0 bottom-0 w-1" style="background: var(--primary);"></div>
+                
+                <div class="p-5 pl-7">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-white">TCP-FREE</h3>
+                            <p class="text-[10px] opacity-50 font-mono mt-1">python main.py</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider" 
+                              style="background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary);">
+                            running
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2">
+                        
+                        <a href="/action/TCP-FREE/stop" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: var(--danger); border: 1px solid var(--danger);">
+                            <i class="fas fa-stop"></i>
+                        </a>
+                        <a href="/action/TCP-FREE/restart" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: yellow; border: 1px solid yellow;">
+                            <i class="fas fa-sync"></i>
+                        </a>
+                        
+                        <button onclick="toggleLog('TCP-FREE')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: cyan; border: 1px solid cyan;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="openSettings('TCP-FREE')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: magenta; border: 1px solid magenta;">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+
+                    <div id="log-box-TCP-FREE" class="hidden mt-4 pt-3 border-t" style="border-color: var(--primary);">
+                        <pre id="log-TCP-FREE" class="bg-black p-3 rounded-lg text-[11px] h-32 overflow-y-auto custom-scroll font-mono leading-tight log-text" style="color: var(--primary);">Waiting for logs...</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-bg rounded-2xl overflow-hidden shadow-lg relative group server-card">
+                <div class="absolute left-0 top-0 bottom-0 w-1" style="background: var(--primary);"></div>
+                
+                <div class="p-5 pl-7">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-white">বাগাম্মিল</h3>
+                            <p class="text-[10px] opacity-50 font-mono mt-1">python ARIYAN.py</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider" 
+                              style="background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary);">
+                            running
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2">
+                        
+                        <a href="/action/বাগাম্মিল/stop" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: var(--danger); border: 1px solid var(--danger);">
+                            <i class="fas fa-stop"></i>
+                        </a>
+                        <a href="/action/বাগাম্মিল/restart" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: yellow; border: 1px solid yellow;">
+                            <i class="fas fa-sync"></i>
+                        </a>
+                        
+                        <button onclick="toggleLog('বাগাম্মিল')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: cyan; border: 1px solid cyan;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="openSettings('বাগাম্মিল')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: magenta; border: 1px solid magenta;">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+
+                    <div id="log-box-বাগাম্মিল" class="hidden mt-4 pt-3 border-t" style="border-color: var(--primary);">
+                        <pre id="log-বাগাম্মিল" class="bg-black p-3 rounded-lg text-[11px] h-32 overflow-y-auto custom-scroll font-mono leading-tight log-text" style="color: var(--primary);">Waiting for logs...</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-bg rounded-2xl overflow-hidden shadow-lg relative group server-card">
+                <div class="absolute left-0 top-0 bottom-0 w-1" style="background: var(--primary);"></div>
+                
+                <div class="p-5 pl-7">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-white">Tcp</h3>
+                            <p class="text-[10px] opacity-50 font-mono mt-1">python main.py</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider" 
+                              style="background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary);">
+                            running
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2">
+                        
+                        <a href="/action/Tcp/stop" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: var(--danger); border: 1px solid var(--danger);">
+                            <i class="fas fa-stop"></i>
+                        </a>
+                        <a href="/action/Tcp/restart" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: yellow; border: 1px solid yellow;">
+                            <i class="fas fa-sync"></i>
+                        </a>
+                        
+                        <button onclick="toggleLog('Tcp')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: cyan; border: 1px solid cyan;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="openSettings('Tcp')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: magenta; border: 1px solid magenta;">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+
+                    <div id="log-box-Tcp" class="hidden mt-4 pt-3 border-t" style="border-color: var(--primary);">
+                        <pre id="log-Tcp" class="bg-black p-3 rounded-lg text-[11px] h-32 overflow-y-auto custom-scroll font-mono leading-tight log-text" style="color: var(--primary);">Waiting for logs...</pre>
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+        </div>
+    </div>
+
+    <div id="theme-view" class="main-view px-4 py-6">
+        <h2 class="text-xl font-bold mb-6 header-text">Theme Customizer</h2>
+        
+        <div class="card-bg p-6 rounded-xl space-y-6">
+            <div>
+                <label class="block text-sm mb-2 opacity-70 stats-text">Color Theme</label>
+
+  
